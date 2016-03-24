@@ -1,4 +1,4 @@
-package com.santiago.json;
+package com.santiago.entity.json;
 
 import org.json.JSONArray;
 import org.json.JSONException;

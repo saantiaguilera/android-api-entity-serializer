@@ -3,7 +3,7 @@ package com.santiago.shared_preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.santiago.json.JSONSerializer;
+import com.santiago.entity.json.JSONSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +16,7 @@ import java.util.Map;
  * Custom shared prefs that interact easier and features json processing
  *
  * @note Just as this works, you can simply do it for passing jsons in intents or any place you like
+ * @note TODO Refactor. Class should work in a bg thread
  *
  * Created by santiago on 19/03/16.
  */

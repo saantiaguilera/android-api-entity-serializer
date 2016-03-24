@@ -1,6 +1,6 @@
 package com.santiago.entity;
 
-import com.santiago.json.JSONSerializer;
+import com.santiago.entity.json.JSONSerializer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
