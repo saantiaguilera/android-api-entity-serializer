@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 
  * Custom shared prefs that interact easier and features json processing
  *
  * @note Just as this works, you can simply do it for passing jsons in intents or any place you like
