@@ -10,6 +10,9 @@ import com.santiago.shared_preferences.JSONSharedPreferences;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * I show an example with the sharedprefs, but know that you can do this practically with anything
  * since I just serialize them to Strings.
@@ -54,15 +57,18 @@ public class ExampleActivity extends Activity {
     }
 
     private void onButtonClick() {
+        List<ExampleJSONEntity> entities = new ArrayList<>();
+        entities.add(entity);
+
         sharedPreferences.openDocument(DOCUMENT_KEY_EXAMPLE);
 
         sharedPreferences.startEditing()
-                .put(ENTITY_KEY_EXAMPLE, entity)
+                .put(ENTITY_KEY_EXAMPLE, entities)
                 .commit();
 
         try {
-            ExampleJSONEntity newEntity = (ExampleJSONEntity) sharedPreferences.get(ENTITY_KEY_EXAMPLE, entity);
-            finalContainer.setText(newEntity.getString1() + " - Reached the other side - " + newEntity.getString2());
+            List<ExampleJSONEntity> newEntities = sharedPreferences.getList(ENTITY_KEY_EXAMPLE, ExampleJSONEntity.class);
+            finalContainer.setText(newEntities.get(0).getString1() + " - Reached the other side - " + newEntities.get(0).getString2());
         } catch (JSONException e) {
             e.printStackTrace();
         }

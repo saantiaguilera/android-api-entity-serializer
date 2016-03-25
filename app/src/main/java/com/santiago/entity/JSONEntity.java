@@ -1,11 +1,10 @@
 package com.santiago.entity;
 
-import com.santiago.entity.json.JSONSerializer;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
  *
  * Created by santiago on 19/03/16.
  */
-public class JSONEntity implements JSONSerializer<JSONEntity> {
+public abstract class JSONEntity {
 
     /*-------------------------------------------------JSON Fields References-------------------------------------------------*/
 
@@ -100,7 +99,6 @@ public class JSONEntity implements JSONSerializer<JSONEntity> {
 
     /*---------------------------------------------------JSON Serializer--------------------------------------------------------*/
 
-    @Override
     public JSONObject asJSONObject(){
         JSONObject jsonObject = new JSONObject();
 
@@ -111,34 +109,49 @@ public class JSONEntity implements JSONSerializer<JSONEntity> {
         return jsonObject;
     }
 
-    @Override
-    public JSONArray listAsJSONArray(List<JSONEntity> list) {
+    /**
+     *
+     * If you dont like this, just go with creating in each of your JSONEntities this and {@link JSONEntity#listFromJSONArray(Class, JSONArray)} and change the Reflection things (and T)
+     * for their own Classes
+     * @param list
+     * @param <T>
+     * @return
+     */
+    public static <T extends JSONEntity> JSONArray listAsJSONArray(List<T> list) {
         if(list == null)
-            throw new NullPointerException("list cannot be null in listAsJSONArray inside class " + getClass().getSimpleName());
+            throw new NullPointerException("list cannot be null in listAsJSONArray");
 
         JSONArray result = new JSONArray();
 
-        for(JSONEntity JSONEntity : list)
-            result.put(JSONEntity.asJSONObject());
+        for(T t : list)
+            result.put(t.asJSONObject());
 
         return result;
     }
 
-    @Override
-    public List<JSONEntity> listFromJSONArray(JSONArray jarr) throws JSONException {
+    /**
+     * TODO refactor. Is this the right approach ? I dont like it
+     * If you dont like this, just go with creating in each of your JSONEntities this and {@link JSONEntity#listAsJSONArray(List)} and change the Reflection things (and T)
+     * for their own Classes
+     * @param jarr
+     * @return
+     * @throws JSONException
+     */
+    public static <T extends JSONEntity> List<T> listFromJSONArray(Class<T> mClass, JSONArray jarr) throws JSONException {
         if (jarr == null)
             throw new NullPointerException("JSONArray cannot be null");
 
-        List<JSONEntity> result = new ArrayList<>();
+        List<T> result = new ArrayList<>();
 
         for (int i = 0; i < jarr.length(); i++) {
             try {
-                result.add(new JSONEntity(jarr.getJSONObject(i)));
-            } catch (JSONException e) { }
+                result.add(mClass.getConstructor(JSONObject.class).newInstance(jarr.getJSONObject(i)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return result;
-
     }
 
 }

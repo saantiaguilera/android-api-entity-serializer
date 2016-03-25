@@ -3,17 +3,18 @@ package com.santiago.shared_preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.santiago.entity.json.JSONSerializer;
+import com.santiago.entity.JSONEntity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *
  * Custom shared prefs that interact easier and features json processing
  *
  * @note Just as this works, you can simply do it for passing jsons in intents or any place you like
@@ -106,7 +107,7 @@ public class JSONSharedPreferences {
      * getter of an object that can be JSONified
      * @throws JSONException
      */
-    public <T extends JSONSerializer> Object get(String key, T t) throws JSONException {
+    public <T extends JSONEntity> T get(String key, Class<T> mClass) throws JSONException {
         validateSharedPreferences();
 
         String jsonString = sharedPreferences.getString(key, null);
@@ -114,14 +115,18 @@ public class JSONSharedPreferences {
         if(jsonString == null)
             return null;
 
-        return t.setValuesFrom(new JSONObject(jsonString));
+        try {
+            return mClass.getConstructor(JSONObject.class).newInstance(new JSONObject(jsonString));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
      * getter of a list of objects that can be JSONified
      * @throws JSONException
      */
-    public <T extends JSONSerializer> Object getList(String key, T t) throws JSONException {
+    public <T extends JSONEntity> List<T> getList(String key, Class<T> mClass) throws JSONException {
         validateSharedPreferences();
 
         String jsonString = sharedPreferences.getString(key, null);
@@ -129,7 +134,16 @@ public class JSONSharedPreferences {
         if(jsonString == null)
             return null;
 
-        return t.listFromJSONArray(new JSONArray(jsonString));
+        Class<?> superClass = mClass;
+
+        while(superClass != JSONEntity.class)
+            superClass = superClass.getSuperclass();
+
+        try {
+            return (List<T>) superClass.getDeclaredMethod("listFromJSONArray", Class.class, JSONArray.class).invoke(mClass, mClass, new JSONArray(jsonString));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /*----------------------------------------------Setters-------------------------------------------*/
@@ -196,7 +210,7 @@ public class JSONSharedPreferences {
     /**
      * Method for serializing an object inside the SP. Object must implement JSONSerializer
      */
-    public <T extends JSONSerializer> JSONSharedPreferences put(String key, T value) {
+    public <T extends JSONEntity> JSONSharedPreferences put(String key, T value) {
         validateEditor();
 
         editor.putString(key, value.asJSONObject().toString());
@@ -206,11 +220,11 @@ public class JSONSharedPreferences {
     /**
      * Method for serializing a list of object inside the SP. Objects must implement JSONSerializer
      */
-    public <T extends JSONSerializer> JSONSharedPreferences put(String key, List<T> values) {
+    public <T extends JSONEntity> JSONSharedPreferences put(String key, List<T> values) {
         validateEditor();
 
-        if(!values.isEmpty()) //TODO WORKAROUND, REFACTOR.
-            editor.putString(key, values.get(0).listAsJSONArray(values).toString());
+        if(!values.isEmpty())
+            editor.putString(key, T.listAsJSONArray(values).toString());
 
         return this;
     }
