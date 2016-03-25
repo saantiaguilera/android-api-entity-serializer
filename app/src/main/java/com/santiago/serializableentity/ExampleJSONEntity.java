@@ -54,13 +54,11 @@ public class ExampleJSONEntity extends JSONEntity {
     }
 
     @Override
-    public ExampleJSONEntity setValuesFrom(JSONObject jsonObject) throws JSONException {
+    public void setValuesFrom(JSONObject jsonObject) throws JSONException {
         super.setValuesFrom(jsonObject);
 
         string1 = jsonObject.getString(JSON_KEY_STRING1);
         string2 = jsonObject.getString(JSON_KEY_STRING2);
-
-        return this;
     }
 
     @Override

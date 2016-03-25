@@ -59,13 +59,11 @@ public abstract class JSONEntity {
         else setDefaultValues();
     }
 
-    public JSONEntity setValuesFrom(JSONObject jsonObject) throws JSONException {
+    public void setValuesFrom(JSONObject jsonObject) throws JSONException {
         if (jsonObject == null)
             throw new JSONException("JSONObject cannot be null");
 
         setId(jsonObject.optLong(ID_JSON));
-
-        return this;
     }
 
     public void setDefaultValues(){
