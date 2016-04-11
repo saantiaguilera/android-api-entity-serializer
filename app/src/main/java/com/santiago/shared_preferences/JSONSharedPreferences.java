@@ -3,13 +3,8 @@ package com.santiago.shared_preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.santiago.entity.JSONEntity;
-
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -107,7 +102,7 @@ public class JSONSharedPreferences {
      * getter of an object that can be JSONified
      * @throws JSONException
      */
-    public <T extends JSONEntity> T get(String key, Class<T> mClass) throws JSONException {
+    public <T> T get(String key, JSONSharedPreferencesHidrater<T> hidrate) throws JSONException {
         validateSharedPreferences();
 
         String jsonString = sharedPreferences.getString(key, null);
@@ -115,35 +110,18 @@ public class JSONSharedPreferences {
         if(jsonString == null)
             return null;
 
-        try {
-            return mClass.getConstructor(JSONObject.class).newInstance(new JSONObject(jsonString));
-        } catch (Exception e) {
-            return null;
-        }
+        return hidrate.hidrateFromSP(jsonString);
     }
 
-    /**
-     * getter of a list of objects that can be JSONified
-     * @throws JSONException
-     */
-    public <T extends JSONEntity> List<T> getList(String key, Class<T> mClass) throws JSONException {
+    public <T> List<T> get(String key, JSONSharedPreferencesListHidrater<T> hidrate) throws JSONException {
         validateSharedPreferences();
 
         String jsonString = sharedPreferences.getString(key, null);
 
-        if(jsonString == null)
+        if (jsonString == null)
             return null;
 
-        Class<?> superClass = mClass;
-
-        while(superClass != JSONEntity.class)
-            superClass = superClass.getSuperclass();
-
-        try {
-            return (List<T>) superClass.getDeclaredMethod("listFromJSONArray", Class.class, JSONArray.class).invoke(mClass, mClass, new JSONArray(jsonString));
-        } catch (Exception e) {
-            return null;
-        }
+        return hidrate.hidrateListFromSP(jsonString);
     }
 
     /*----------------------------------------------Setters-------------------------------------------*/
@@ -153,7 +131,7 @@ public class JSONSharedPreferences {
      * flow:
      * 1. start editing
      * 2. put / remove whatever you need to
-     * 3. commit
+     * 3. commit/apply
      * 4. start editing again if needed
      *
      * @throws com.santiago.shared_preferences.JSONSharedPreferences.JSONSharedPreferencesEditorException if trying to edit twice without discarding or commiting.
@@ -165,6 +143,7 @@ public class JSONSharedPreferences {
         validateSharedPreferences();
 
         editor = sharedPreferences.edit();
+
         return this;
     }
 
@@ -210,22 +189,20 @@ public class JSONSharedPreferences {
     /**
      * Method for serializing an object inside the SP. Object must implement JSONSerializer
      */
-    public <T extends JSONEntity> JSONSharedPreferences put(String key, T value) {
+    public <T> JSONSharedPreferences put(String key, T t, JSONSharedPreferencesSerializer<T> serializer) {
         validateEditor();
 
-        editor.putString(key, value.asJSONObject().toString());
+        editor.putString(key, serializer.serializeFromSP(t));
         return this;
     }
 
     /**
-     * Method for serializing a list of object inside the SP. Objects must implement JSONSerializer
+     * Method for serializing a list of object inside the SP. Object must implement JSONSerializer
      */
-    public <T extends JSONEntity> JSONSharedPreferences put(String key, List<T> values) {
+    public <T> JSONSharedPreferences put(String key, List<T> t, JSONSharedPreferencesListSerializer<T> serializer) {
         validateEditor();
 
-        if(!values.isEmpty())
-            editor.putString(key, T.listAsJSONArray(values).toString());
-
+        editor.putString(key, serializer.serializeListFromSP(t));
         return this;
     }
 
@@ -251,20 +228,47 @@ public class JSONSharedPreferences {
     }
 
     /**
+     * Commit the changes
+     * @Asynchronous
+     */
+    public void apply() {
+        validateEditor();
+
+        editor.apply();
+        discard();
+    }
+
+    /**
      * Discard changes
      */
     public void discard() {
         editor = null;
     }
 
-    /*------------------------------------Exceptions-------------------------------------------------*/
+    /*------------------------------------Exceptions----------------------------------------------*/
 
     public class JSONSharedPreferencesEditorException extends RuntimeException {
-
         public JSONSharedPreferencesEditorException(String message) {
             super(message);
         }
+    }
 
+    /*----------------------------------------Interface-------------------------------------------*/
+
+    public interface JSONSharedPreferencesListHidrater<T> {
+        List<T> hidrateListFromSP(String string);
+    }
+
+    public interface JSONSharedPreferencesListSerializer<T> {
+        String serializeListFromSP(List<T> tList);
+    }
+
+    public interface JSONSharedPreferencesSerializer<T> {
+        String serializeFromSP(T t);
+    }
+
+    public interface JSONSharedPreferencesHidrater<T> {
+        T hidrateFromSP(String string);
     }
 
 }

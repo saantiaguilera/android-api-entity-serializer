@@ -1,4 +1,4 @@
-package com.santiago.serializableentity;
+package com.santiago.example;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.santiago.example.entity.ExampleEntity;
+import com.santiago.example.serializer.ExampleSerializer;
 import com.santiago.shared_preferences.JSONSharedPreferences;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +30,8 @@ public class ExampleActivity extends Activity {
     private static final String ENTITY_KEY_EXAMPLE = "com.santiago.ENTITY_KEY_EXAMPLE";
 
     private JSONSharedPreferences sharedPreferences;
-    private ExampleJSONEntity entity;
+    private ExampleEntity entity;
+    private ExampleSerializer serializer;
 
     private TextView initialContainer;
     private TextView button;
@@ -43,7 +47,8 @@ public class ExampleActivity extends Activity {
         button = (TextView) findViewById(R.id.example_activity_button);
         finalContainer = (TextView) findViewById(R.id.example_activity_text2);
 
-        entity = new ExampleJSONEntity();
+        entity = new ExampleEntity();
+        serializer = new ExampleSerializer();
         sharedPreferences = new JSONSharedPreferences(this);
 
         initialContainer.setText(entity.getString1() + " - " + entity.getString2());
@@ -57,17 +62,18 @@ public class ExampleActivity extends Activity {
     }
 
     private void onButtonClick() {
-        List<ExampleJSONEntity> entities = new ArrayList<>();
+        List<ExampleEntity> entities = new ArrayList<>();
         entities.add(entity);
 
         sharedPreferences.openDocument(DOCUMENT_KEY_EXAMPLE);
 
         sharedPreferences.startEditing()
-                .put(ENTITY_KEY_EXAMPLE, entities)
+                .put(ENTITY_KEY_EXAMPLE, entities, serializer)
                 .commit();
 
         try {
-            List<ExampleJSONEntity> newEntities = sharedPreferences.getList(ENTITY_KEY_EXAMPLE, ExampleJSONEntity.class);
+            List<ExampleEntity> newEntities = sharedPreferences.get(ENTITY_KEY_EXAMPLE,
+                    (JSONSharedPreferences.JSONSharedPreferencesListHidrater<ExampleEntity>) serializer);
             finalContainer.setText(newEntities.get(0).getString1() + " - Reached the other side - " + newEntities.get(0).getString2());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -78,13 +84,13 @@ public class ExampleActivity extends Activity {
 
     private void createAnIntentWithMyEntity() {
         Intent intent = new Intent();
-        intent.putExtra(ENTITY_KEY_EXAMPLE, entity.asJSONObject().toString());
+        intent.putExtra(ENTITY_KEY_EXAMPLE, serializer.serialize(entity).toString());
     }
 
     private void createAnEntityWithMyIntent() {
         try {
             Intent intent = getIntent();
-            entity = new ExampleJSONEntity(intent.getStringExtra(ENTITY_KEY_EXAMPLE));
+            entity = serializer.hidrate(new JSONObject(intent.getStringExtra(ENTITY_KEY_EXAMPLE)));
         } catch (JSONException e) {
             e.printStackTrace();
         }

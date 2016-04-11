@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SerializableEntity.iml" filepath="$PROJECT_DIR$/SerializableEntity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android-api-serializable-entity.iml" filepath="$PROJECT_DIR$/android-api-serializable-entity.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
