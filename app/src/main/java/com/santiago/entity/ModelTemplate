@@ -1,0 +1,66 @@
+/**
+ * WIP. Use at your own risk until finished.
+
+ * Code in Apache Velocity
+ * https://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html
+ * Author: Santiago
+ */
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+
+/*
+#set ( $Var1Uppercased = ${var1}.substr(0, 1).toUpperCase() + ${var1}.substring(1) )
+#set ( $Var2Uppercased = ${var2}.substr(0, 1).toUpperCase() + ${var2}.substring(1) )
+*/
+
+import com.santiago.entity.BaseEntity;
+
+#parse("File Header.java")
+public class ${modelClass} extends BaseEntity {
+
+    private ${var1Class} ${var1};
+    private ${var2Class} ${var2};
+
+    public ${modelClass}() {
+        super();
+    }
+
+    public ${modelClass}(${modelClass} model) {
+        super(model);
+    }
+
+    /*---------------------------Overrides of mutables----------------------------------*/
+
+    public void setValuesFrom(${modelClass} model) {
+        super.setValuesFrom(model);
+
+        ${var1} = model.get$var1();
+        ${var2} = model.get$var2();
+    }
+
+    @Override
+    public void setDefaultValues() {
+        super.setDefaultValues();
+
+        ${var1} = ${defaultValueVar1};
+        ${var2} = ${defaultValueVar2};
+    }
+
+    /*----------------------------------Getters and Setters----------------------------*/
+
+    public ${var1Class} get$Var1Uppercased() {
+        return ${var1};
+    }
+
+    public ${var2Class} get$Var2Uppercased() {
+        return ${var2};
+    }
+
+    public void set$Var1Uppercased(${var1Class} ${var1}) {
+        this.${var1} = ${var1};
+    }
+
+    public void set$Var2Uppercased(${var2Class} ${var2}) {
+        this.${var2} = ${var2};
+    }
+
+}
