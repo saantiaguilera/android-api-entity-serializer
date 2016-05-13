@@ -1,5 +1,7 @@
 package com.santiago.example.persistables;
 
+import android.support.annotation.NonNull;
+
 import com.santiago.example.entity.ExampleEntity;
 import com.santiago.persistables.serializer.BaseJSONSerializer;
 import com.santiago.shared_preferences.JSONSharedPreferences;
@@ -20,7 +22,7 @@ JSONSharedPreferences.JSONSharedPreferencesListSerializer<ExampleEntity> {
     private static final String JSON_KEY_STRING2 = "string_2";
 
     @Override
-    public JSONObject serialize(ExampleEntity exampleEntity) {
+    public @NonNull JSONObject serialize(@NonNull ExampleEntity exampleEntity) {
         JSONObject jobj = new JSONObject();
 
         try {

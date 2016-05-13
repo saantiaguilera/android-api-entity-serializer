@@ -1,5 +1,7 @@
 package com.santiago.entity;
 
+import android.support.annotation.Nullable;
+
 /**
  * BaseEntity
  *
@@ -17,7 +19,7 @@ public abstract class BaseEntity {
         setDefaultValues();
     }
 
-    public BaseEntity(BaseEntity Entity) {
+    public BaseEntity(@Nullable BaseEntity Entity) {
         setValuesFrom(Entity);
     }
 	/*------------------------------------------------Getters------------------------------------------------------------*/
@@ -32,7 +34,7 @@ public abstract class BaseEntity {
         this.id = id;
     }
 
-    public void setValuesFrom(BaseEntity Entity){
+    public void setValuesFrom(@Nullable BaseEntity Entity){
         if(Entity != null)
             setId(Entity.getId());
         else setDefaultValues();

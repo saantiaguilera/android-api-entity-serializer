@@ -1,5 +1,7 @@
 package com.santiago.persistables.serializer;
 
+import android.support.annotation.NonNull;
+
 import com.santiago.entity.BaseEntity;
 
 import org.json.JSONArray;
@@ -18,7 +20,7 @@ public abstract class BaseJSONSerializer<T extends BaseEntity> {
      * @param t entity to be serialized to JSON
      * @return a JSONObject that holds the information of T
      */
-    public abstract JSONObject serialize(T t);
+    public abstract @NonNull JSONObject serialize(@NonNull T t);
 
     /**
      * Creates a JSONArray from a list of entities T.
@@ -29,7 +31,7 @@ public abstract class BaseJSONSerializer<T extends BaseEntity> {
      * @param tList list that holds all the entities to be serialized
      * @return JSONArray with the list serialized
      */
-    public JSONArray serialize(List<T> tList) {
+    public @NonNull JSONArray serialize(@NonNull List<T> tList) {
         JSONArray jarr = new JSONArray();
 
         for (T t : tList)

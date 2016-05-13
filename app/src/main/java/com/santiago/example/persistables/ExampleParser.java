@@ -1,5 +1,7 @@
 package com.santiago.example.persistables;
 
+import android.support.annotation.NonNull;
+
 import com.santiago.example.entity.ExampleEntity;
 import com.santiago.persistables.parser.BaseJSONParser;
 import com.santiago.shared_preferences.JSONSharedPreferences;
@@ -20,7 +22,7 @@ public class ExampleParser extends BaseJSONParser<ExampleEntity> implements JSON
     private static final String JSON_KEY_STRING2 = "string_2";
 
     @Override
-    public ExampleEntity parse(JSONObject jobj) {
+    public @NonNull ExampleEntity parse(@NonNull JSONObject jobj) {
         ExampleEntity entity = new ExampleEntity();
 
         try {
