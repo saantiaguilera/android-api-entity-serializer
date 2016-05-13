@@ -1,10 +1,4 @@
-Serializer & Entity
-
-
----------------------------------------------------------
-TODO
----------------------------------------------------------
-- Refactor Serializer name since it also parses
+Serializer/Parser & Entity
 
 
 ---------------------------------------------------------
@@ -50,10 +44,12 @@ public class ExampleEntity extends BaseEntity {
 ```
 
 ---------------------------------------------------------
-Serializer (and parser, I should refactor it)
+Serializer & Parser
 ---------------------------------------------------------
 
-Serializer is used for hidrating or serializing a model.
+NOTE: Both of them work for JSON only currently.
+
+Serializer is used for serializing a model into a JSONObject.
 
 ```Java
 public class ExampleSerializer extends BaseJSONSerializer<ExampleEntity> {
@@ -62,21 +58,7 @@ public class ExampleSerializer extends BaseJSONSerializer<ExampleEntity> {
     private static final String JSON_KEY_STRING2 = "string_2";
 
     @Override
-    public ExampleEntity hidrate(JSONObject jobj) {
-        ExampleEntity entity = new ExampleEntity();
-
-        try {
-            entity.setString1(jobj.getString(JSON_KEY_STRING1));
-            entity.setString2(jobj.getString(JSON_KEY_STRING2));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return entity;
-    }
-
-    @Override
-    public JSONObject serialize(ExampleEntity exampleEntity) {
+    public @NonNull JSONObject serialize(@NonNull ExampleEntity exampleEntity) {
         JSONObject jobj = new JSONObject();
 
         try {
@@ -88,7 +70,30 @@ public class ExampleSerializer extends BaseJSONSerializer<ExampleEntity> {
 
         return jobj;
     }
-
+    
 }
+```
 
+Parser is used to parse a model from a JSONObject
+```Java
+public class ExampleParser extends BaseJSONParser<ExampleEntity> {
+
+    private static final String JSON_KEY_STRING1 = "string_1";
+    private static final String JSON_KEY_STRING2 = "string_2";
+
+    @Override
+    public @NonNull ExampleEntity parse(@NonNull JSONObject jobj) {
+        ExampleEntity entity = new ExampleEntity();
+
+        try {
+            entity.setString1(jobj.getString(JSON_KEY_STRING1));
+            entity.setString2(jobj.getString(JSON_KEY_STRING2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return entity;
+    }
+    
+}
 ```
