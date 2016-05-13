@@ -7,7 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.santiago.example.entity.ExampleEntity;
-import com.santiago.example.serializer.ExampleSerializer;
+import com.santiago.example.persistables.ExampleParser;
+import com.santiago.example.persistables.ExampleSerializer;
 import com.santiago.shared_preferences.JSONSharedPreferences;
 
 import org.json.JSONException;
@@ -32,6 +33,7 @@ public class ExampleActivity extends Activity {
     private JSONSharedPreferences sharedPreferences;
     private ExampleEntity entity;
     private ExampleSerializer serializer;
+    private ExampleParser parser;
 
     private TextView initialContainer;
     private TextView button;
@@ -49,6 +51,7 @@ public class ExampleActivity extends Activity {
 
         entity = new ExampleEntity();
         serializer = new ExampleSerializer();
+        parser = new ExampleParser();
         sharedPreferences = new JSONSharedPreferences(this);
 
         initialContainer.setText(entity.getString1() + " - " + entity.getString2());
@@ -73,7 +76,7 @@ public class ExampleActivity extends Activity {
 
         try {
             List<ExampleEntity> newEntities = sharedPreferences.get(ENTITY_KEY_EXAMPLE,
-                    (JSONSharedPreferences.JSONSharedPreferencesListHidrater<ExampleEntity>) serializer);
+                    (JSONSharedPreferences.JSONSharedPreferencesListParser<ExampleEntity>) parser);
             finalContainer.setText(newEntities.get(0).getString1() + " - Reached the other side - " + newEntities.get(0).getString2());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -90,7 +93,7 @@ public class ExampleActivity extends Activity {
     private void createAnEntityWithMyIntent() {
         try {
             Intent intent = getIntent();
-            entity = serializer.hidrate(new JSONObject(intent.getStringExtra(ENTITY_KEY_EXAMPLE)));
+            entity = parser.parse(new JSONObject(intent.getStringExtra(ENTITY_KEY_EXAMPLE)));
         } catch (JSONException e) {
             e.printStackTrace();
         }

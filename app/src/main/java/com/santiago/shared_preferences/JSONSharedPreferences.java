@@ -102,7 +102,7 @@ public class JSONSharedPreferences {
      * getter of an object that can be JSONified
      * @throws JSONException
      */
-    public <T> T get(String key, JSONSharedPreferencesHidrater<T> hidrate) throws JSONException {
+    public <T> T get(String key, JSONSharedPreferencesParser<T> parser) throws JSONException {
         validateSharedPreferences();
 
         String jsonString = sharedPreferences.getString(key, null);
@@ -110,10 +110,10 @@ public class JSONSharedPreferences {
         if(jsonString == null)
             return null;
 
-        return hidrate.hidrateFromSP(jsonString);
+        return parser.parseFromSP(jsonString);
     }
 
-    public <T> List<T> get(String key, JSONSharedPreferencesListHidrater<T> hidrate) throws JSONException {
+    public <T> List<T> get(String key, JSONSharedPreferencesListParser<T> parser) throws JSONException {
         validateSharedPreferences();
 
         String jsonString = sharedPreferences.getString(key, null);
@@ -121,7 +121,7 @@ public class JSONSharedPreferences {
         if (jsonString == null)
             return null;
 
-        return hidrate.hidrateListFromSP(jsonString);
+        return parser.parseListFromSP(jsonString);
     }
 
     /*----------------------------------------------Setters-------------------------------------------*/
@@ -255,8 +255,8 @@ public class JSONSharedPreferences {
 
     /*----------------------------------------Interface-------------------------------------------*/
 
-    public interface JSONSharedPreferencesListHidrater<T> {
-        List<T> hidrateListFromSP(String string);
+    public interface JSONSharedPreferencesListParser<T> {
+        List<T> parseListFromSP(String string);
     }
 
     public interface JSONSharedPreferencesListSerializer<T> {
@@ -267,8 +267,8 @@ public class JSONSharedPreferences {
         String serializeFromSP(T t);
     }
 
-    public interface JSONSharedPreferencesHidrater<T> {
-        T hidrateFromSP(String string);
+    public interface JSONSharedPreferencesParser<T> {
+        T parseFromSP(String string);
     }
 
 }
