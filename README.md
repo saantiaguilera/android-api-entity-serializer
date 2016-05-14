@@ -97,3 +97,11 @@ public class ExampleParser extends BaseJSONParser<ExampleEntity> {
     
 }
 ```
+By default theres already implemented a:
+```Java
+//In the parser...
+public @NonNull List<AClass> parse(@NonNull JSONArray jarr);
+//In the serializer...
+public @NonNull JSONArray serialize(@NonNull List<AClass> listOfAClass);
+```
+You can also override them if you need another logic for them, but by default it just uses the case were each JSONObject from a JSONArray is AClass object.
